@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Gestión de Hotel SGH</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f4f6fa;
+      margin: 0;
+      padding: 0;
+      color: #222;
+    }
+    header {
+      background: #2d3e50;
+      color: #fff;
+      padding: 1rem 2rem;
+      text-align: center;
+      font-size: 2rem;
+      letter-spacing: 2px;
+      margin-bottom: 2rem;
+    }
+    main {
+      max-width: 900px;
+      margin: auto;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 12px #0001;
+      padding: 2rem;
+    }
+    section {
+      margin-bottom: 2.5rem;
+    }
+    h2 {
+      color: #2d3e50;
+      margin-bottom: 0.5rem;
+      font-size: 1.3rem;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 0.3rem;
+    }
+    form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      align-items: flex-end;
+    }
+    form input, form select {
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 1rem;
+      background: #fafbfc;
+      min-width: 120px;
+    }
+    form button {
+      background: #2d3e50;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 0.6rem 1.2rem;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    form button:hover {
+      background: #1a2533;
+    }
+    .list {
+      background: #f8f9fb;
+      border-radius: 6px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 1px 4px #0001;
+    }
+    .list-item {
+      padding: 0.5rem 0;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .list-item:last-child {
+      border-bottom: none;
+    }
+    .actions button {
+      margin-left: 0.5rem;
+      background: #e74c3c;
+      color: #fff;
+      border: none;
+      border-radius: 3px;
+      padding: 0.3rem 0.7rem;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: background 0.2s;
+    }
+    .actions button.confirm {
+      background: #27ae60;
+    }
+    .actions button.cancel {
+      background: #e67e22;
+    }
+    .out {
+      font-size: 0.95rem;
+      color: #555;
+      background: #f6f8fa;
+      border-radius: 4px;
+      padding: 0.7rem;
+      margin-top: 0.5rem;
+      white-space: pre-wrap;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    @media (max-width: 700px) {
+      main { padding: 1rem; }
+      form { flex-direction: column; gap: 0.7rem; }
+    }
+  </style>
+</head>
+<body>
+  <header>Gestión de Hotel SGH</header>
+  <main>
+    <section>
+      <h2>Habitaciones</h2>
+      <form id="roomForm">
+        <input name="number" placeholder="Número" required>
+        <select name="type" required>
+          <option value="">Tipo</option>
+          <option>Sencilla</option>
+          <option>Doble</option>
+          <option>Suite</option>
+        </select>
+        <input name="price_base" type="number" min="0" step="0.01" placeholder="Precio base (€)" required>
+        <select name="cleaning_state">
+          <option value="Limpia">Limpia</option>
+          <option value="Sucia">Sucia</option>
+          <option value="En Limpieza">En Limpieza</option>
+        </select>
+        <button type="submit">Añadir habitación</button>
+        <button type="button" onclick="listRooms()">Listar habitaciones</button>
+      </form>
+      <div class="list" id="roomsOut"></div>
+    </section>
+
+    <section>
+      <h2>Huéspedes</h2>
+      <form id="guestForm">
+        <input name="name" placeholder="Nombre" required>
+        <input name="email" type="email" placeholder="Email" required>
+        <input name="documento_identidad" placeholder="Documento Identidad">
+        <button type="submit">Añadir huésped</button>
+        <button type="button" onclick="listGuests()">Listar huéspedes</button>
+      </form>
+      <div class="list" id="guestsOut"></div>
+    </section>
+
+    <section>
+      <h2>Tareas de Mantenimiento</h2>
+      <form id="maintForm">
+        <input name="room_id" type="number" min="1" placeholder="ID Habitación" required>
+        <input name="descripcion" placeholder="Descripción" required>
+        <input name="fecha_inicio" type="date" required>
+        <input name="fecha_fin_expected" type="date" required>
+        <select name="activo">
+          <option value="1">Activa</option>
+          <option value="0">Inactiva</option>
+        </select>
+        <button type="submit">Añadir tarea</button>
+        <button type="button" onclick="listMaint()">Listar tareas</button>
+      </form>
+      <div class="list" id="maintOut"></div>
+    </section>
+
+    <section>
+      <h2>Reservas</h2>
+      <form id="reserveForm">
+        <input name="guest_id" type="number" min="1" placeholder="ID Huésped" required>
+        <input name="room_id" type="number" min="1" placeholder="ID Habitación" required>
+        <input name="fecha_llegada" type="date" required>
+        <input name="fecha_salida" type="date" required>
+        <button type="submit">Crear reserva</button>
+        <button type="button" onclick="listReservations()">Listar reservas</button>
+      </form>
+      <div class="list" id="reservationsOut"></div>
+    </section>
+  </main>
+
+  <script>
+    const base = '/index.php';
+
+    async function api(path, method='GET', body=null) {
+      const opts = { method, headers: { 'Content-Type': 'application/json' } };
+      if (body) opts.body = JSON.stringify(body);
+      const res = await fetch(base + path, opts);
+      let data;
+      try { data = await res.json(); } catch { data = null; }
+      return { status: res.status, data };
+    }
+
+    function getDataArray(r) {
+      if (!r) return null;
+      if (Array.isArray(r.data)) return r.data;
+      if (r.data && Array.isArray(r.data.data)) return r.data.data;
+      if (r.data && r.data.success && Array.isArray(r.data.data)) return r.data.data;
+      return null;
+    }
+
+    // --- HABITACIONES ---
+    async function listRooms() {
+      const r = await api('/rooms');
+      const out = document.getElementById('roomsOut');
+      if (!r || r.status !== 200) { out.textContent = JSON.stringify(r, null, 2); return; }
+      const rows = getDataArray(r);
+      if (!rows) { out.textContent = JSON.stringify(r, null, 2); return; }
+      out.innerHTML = rows.map(room => `
+        <div class="list-item">
+          <span><strong>#${room.id}</strong> - ${room.number} (${room.type}) — €${room.price_base} — Estado: ${room.cleaning_state}</span>
+        </div>
+      `).join('');
+    }
+    document.getElementById('roomForm').onsubmit = async e => {
+      e.preventDefault();
+      const f = Object.fromEntries(new FormData(e.target));
+      const r = await api('/rooms', 'POST', f);
+      document.getElementById('roomsOut').textContent = r.status === 201
+        ? 'Habitación añadida correctamente.' : 'Error: ' + (r.data.error || 'Error desconocido');
+      if (r.status === 201) await listRooms();
+      e.target.reset();
+    };
+
+    // --- HUÉSPEDES ---
+    async function listGuests() {
+      const r = await api('/guests');
+      const out = document.getElementById('guestsOut');
+      if (!r || r.status !== 200) { out.textContent = JSON.stringify(r, null, 2); return; }
+      const rows = getDataArray(r);
+      if (!rows) { out.textContent = JSON.stringify(r, null, 2); return; }
+      out.innerHTML = rows.map(g => `
+        <div class="list-item">
+          <span><strong>#${g.id}</strong> - ${g.name} — ${g.email} (${g.documento_identidad || 'Sin documento'})</span>
+        </div>
+      `).join('');
+    }
+    document.getElementById('guestForm').onsubmit = async e => {
+      e.preventDefault();
+      const f = Object.fromEntries(new FormData(e.target));
+      const r = await api('/guests', 'POST', f);
+      document.getElementById('guestsOut').textContent = r.status === 201
+        ? 'Huésped añadido correctamente.' : 'Error: ' + (r.data.error || 'Error desconocido');
+      if (r.status === 201) await listGuests();
+      e.target.reset();
+    };
+
+    // --- MANTENIMIENTO ---
+    async function listMaint() {
+      const r = await api('/maintenance');
+      const out = document.getElementById('maintOut');
+      if (!r || r.status !== 200) { out.textContent = JSON.stringify(r, null, 2); return; }
+      const rows = getDataArray(r);
+      if (!rows) { out.textContent = JSON.stringify(r, null, 2); return; }
+      out.innerHTML = rows.map(m => `
+        <div class="list-item">
+          <span><strong>#${m.id}</strong> Habitación: ${m.room_id} — ${m.descripcion} (${m.fecha_inicio} → ${m.fecha_fin_expected}) [${m.activo ? 'Activa' : 'Inactiva'}]</span>
+        </div>
+      `).join('');
+    }
+    document.getElementById('maintForm').onsubmit = async e => {
+      e.preventDefault();
+      const f = Object.fromEntries(new FormData(e.target));
+      const r = await api('/maintenance', 'POST', f);
+      document.getElementById('maintOut').textContent = r.status === 201
+        ? 'Tarea añadida correctamente.' : 'Error: ' + (r.data.error || 'Error desconocido');
+      if (r.status === 201) await listMaint();
+      e.target.reset();
+    };
+
+    // --- RESERVAS ---
+    async function listReservations() {
+      const r = await api('/reservations');
+      const out = document.getElementById('reservationsOut');
+      if (!r || r.status !== 200) { out.textContent = JSON.stringify(r, null, 2); return; }
+      const rows = getDataArray(r);
+      if (!rows) { out.textContent = JSON.stringify(r, null, 2); return; }
+      out.innerHTML = rows.map(s => `
+        <div class="list-item">
+          <span>
+            <strong>#${s.id}</strong> Huésped: ${s.guest_name} (id:${s.guest_id}) — Habitación: ${s.room_number} (id:${s.room_id})<br>
+            ${s.fecha_llegada} → ${s.fecha_salida} — €${s.precio_total} — Estado: ${s.estado}
+          </span>
+          <span class="actions">
+            ${s.estado === 'Pendiente' ? `
+              <button class="confirm" onclick="confirmReservation(${s.id})">Confirmar</button>
+              <button class="cancel" onclick="cancelReservation(${s.id})">Cancelar</button>
+            ` : ''}
+          </span>
+        </div>
+      `).join('');
+    }
+    document.getElementById('reserveForm').onsubmit = async e => {
+      e.preventDefault();
+      const f = Object.fromEntries(new FormData(e.target));
+      const r = await api('/reserve', 'POST', f);
+      document.getElementById('reservationsOut').textContent = r.status === 201
+        ? 'Reserva creada correctamente.' : 'Error: ' + (r.data.error || 'Error desconocido');
+      if (r.status === 201) await listReservations();
+      e.target.reset();
+    };
+
+    async function confirmReservation(id) {
+      const r = await api(`/reservations/${id}/confirm`, 'POST');
+      document.getElementById('reservationsOut').textContent = r.status === 200
+        ? 'Reserva confirmada.' : 'Error: ' + (r.data.error || 'Error desconocido');
+      if (r.status === 200) await listReservations();
+    }
+    async function cancelReservation(id) {
+      const r = await api(`/reservations/${id}/cancel`, 'POST');
+      document.getElementById('reservationsOut').textContent = r.status === 200
+        ? 'Reserva cancelada.' : 'Error: ' + (r.data.error || 'Error desconocido');
+      if (r.status === 200) await listReservations();
+    }
+
+    // --- Inicialización ---
+    listRooms();
+    listGuests();
+    listMaint();
+    listReservations();
+  </script>
+</body>
+</html>
